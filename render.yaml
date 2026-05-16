@@ -1,0 +1,38 @@
+# render.yaml — Credit Risk Intelligence Platform
+# Deploy to Render free tier with one click
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Usage:
+#   1. Push this repo to GitHub
+#   2. Connect Render to your GitHub
+#   3. Render auto-detects render.yaml and deploys
+
+services:
+
+  - type: web
+    name: credit-risk-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+
+    # Free tier — sufficient for demo + interviews
+    plan: free
+
+    # Health check path
+    healthCheckPath: /health
+
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PYTHONPATH
+        value: /app
+
+    # Auto-deploy on push to main
+    autoDeploy: true
+
+    # Scaling (free tier: 1 instance)
+    scaling:
+      minInstances: 1
+      maxInstances: 1

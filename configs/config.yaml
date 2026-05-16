@@ -1,0 +1,71 @@
+# configs/config.yaml
+# Credit Risk Intelligence Platform — Hyperparameters
+# Agent 2 will consume these for MLflow-tracked experiments
+
+data:
+  train_path: "data/processed/train_features.parquet"
+  test_path: "data/processed/test_features.parquet"
+  target_col: "TARGET"
+  n_folds: 5
+  random_state: 42
+
+xgboost:
+  n_estimators: 1500
+  max_depth: 6
+  learning_rate: 0.02
+  subsample: 0.8
+  colsample_bytree: 0.8
+  colsample_bylevel: 0.6
+  min_child_weight: 30
+  reg_alpha: 0.1
+  reg_lambda: 1.0
+  scale_pos_weight: 11     # handles class imbalance: (total - defaults) / defaults
+  eval_metric: "auc"
+  early_stopping_rounds: 100
+  tree_method: "hist"      # fast histogram-based
+
+lightgbm:
+  n_estimators: 2000
+  num_leaves: 63
+  max_depth: -1
+  learning_rate: 0.02
+  subsample: 0.8
+  subsample_freq: 1
+  colsample_bytree: 0.8
+  min_child_samples: 30
+  reg_alpha: 0.1
+  reg_lambda: 1.0
+  class_weight: "balanced"
+  metric: "auc"
+  early_stopping_rounds: 100
+  verbose: -1
+
+ensemble:
+  xgb_weight: 0.5
+  lgb_weight: 0.5
+
+shap:
+  max_display: 20
+  plot_types: ["bar", "beeswarm", "waterfall", "dependence"]
+  dependence_features:
+    - "EXT_SOURCE_2"
+    - "EXT_SOURCE_3"
+    - "DAYS_BIRTH"
+    - "inst_late_rate"
+    - "CREDIT_TO_INCOME"
+
+mlflow:
+  experiment_name: "credit_risk_intelligence_v1"
+  tracking_uri: "./mlruns"
+  log_models: true
+  log_artifacts: true
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  model_path: "models/xgb_lgb_ensemble.pkl"
+  pipeline_path: "models/feature_pipeline.pkl"
+  risk_thresholds:
+    low: 0.10
+    medium: 0.25
+    high: 0.50

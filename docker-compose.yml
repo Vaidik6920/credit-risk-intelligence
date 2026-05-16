@@ -1,0 +1,65 @@
+# Credit Risk Intelligence Platform — Docker Compose
+# Agent 3 | Vaidik Sharma | github.com/Vaidik6920
+#
+# Services:
+#   api      → FastAPI on :8000
+#   mlflow   → MLflow UI on :5000
+#
+# Usage:
+#   docker-compose up --build        # start everything
+#   docker-compose up api            # API only
+#   docker-compose logs -f api       # follow logs
+
+version: "3.9"
+
+services:
+
+  # ── FastAPI Inference Service ───────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: credit-risk-api:latest
+    container_name: credit_risk_api
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: "8000"
+      PYTHONPATH: /app
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      # Mount models dir so you can swap models without rebuild
+      - ./models:/app/models:ro
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "1.0"
+
+  # ── MLflow Tracking UI ─────────────────────────────────────────────────────
+  mlflow:
+    image: python:3.11-slim
+    container_name: mlflow_ui
+    working_dir: /app
+    volumes:
+      - ./mlruns:/app/mlruns
+      - ./models:/app/models
+    ports:
+      - "5000:5000"
+    command: >
+      sh -c "pip install mlflow --quiet &&
+             mlflow ui --host 0.0.0.0 --port 5000 --backend-store-uri ./mlruns"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: credit_risk_net

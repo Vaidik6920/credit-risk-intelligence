@@ -1,0 +1,17 @@
+﻿__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+data/raw/
+data/processed/
+models/*.pkl
+models/*.npy
+models/submission.csv
+mlruns/
+catboost_info/
+.claude/
+.vscode/
+.env
+kaggle.json
+verify_data.py

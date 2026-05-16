@@ -1,0 +1,13 @@
+{
+  "model_version": "1.0.0",
+  "optimal_threshold": 0.21,
+  "ensemble_weights": [
+    0.55,
+    0.45,
+    0.0
+  ],
+  "feature_count": 271,
+  "training_auc": 0.7899,
+  "train_rows": 307511,
+  "created_at": "2026-05-16T21:50:31.482490"
+}
