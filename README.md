@@ -2,13 +2,16 @@
 
 > **Production-grade credit default prediction system** built on the Home Credit Default Risk dataset (307K+ applications). XGBoost + LightGBM + CatBoost ensemble with SHAP explainability, MLflow experiment tracking, and FastAPI serving.
 
+[![Live Dashboard](https://img.shields.io/badge/Dashboard-Live%20on%20Streamlit-FF4B4B)](https://credit-risk-intelligence.streamlit.app)
 [![Live API](https://img.shields.io/badge/API-Live%20on%20Render-brightgreen)](https://credit-risk-intelligence-xv4z.onrender.com/docs)
 [![AUC-ROC](https://img.shields.io/badge/AUC--ROC-0.7899-blue)](https://github.com/Vaidik6920/credit-risk-intelligence)
 [![MLflow](https://img.shields.io/badge/MLflow-30%20runs-orange)](https://github.com/Vaidik6920/credit-risk-intelligence)
 [![Tests](https://img.shields.io/badge/Tests-36%2F36%20passing-brightgreen)](https://github.com/Vaidik6920/credit-risk-intelligence)
 [![Docker](https://img.shields.io/badge/Docker-ready-blue)](https://github.com/Vaidik6920/credit-risk-intelligence)
 
-**🔗 Live endpoint:** https://credit-risk-intelligence-xv4z.onrender.com/docs
+**🎯 Live Dashboard:** https://credit-risk-intelligence.streamlit.app
+
+**🔗 Live API Docs:** https://credit-risk-intelligence-xv4z.onrender.com/docs
 
 ---
 
@@ -54,13 +57,10 @@ curl -X POST https://credit-risk-intelligence-xv4z.onrender.com/predict \
   "risk_label": "Low Risk",
   "risk_score": 916,
   "recommended_action": "Approve",
-  "top_risk_factors": [],
   "model_version": "xgb_lgb_cat_ensemble_v1",
   "latency_ms": 148.3
 }
 ```
-
-📖 **Full interactive docs:** https://credit-risk-intelligence-xv4z.onrender.com/docs
 
 ---
 
@@ -69,8 +69,8 @@ curl -X POST https://credit-risk-intelligence-xv4z.onrender.com/predict \
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                   DATA LAYER (8 CSV files)                   │
-│  application_train/test │ bureau │ bureau_balance │          │
-│  previous_application   │ POS_CASH │ credit_card │          │
+│  application_train/test · bureau · bureau_balance            │
+│  previous_application · POS_CASH · credit_card              │
 │  installments_payments                                        │
 └──────────────────┬──────────────────────────────────────────┘
                    │
@@ -89,10 +89,11 @@ curl -X POST https://credit-risk-intelligence-xv4z.onrender.com/predict \
 └──────────────────┬──────────────────────────────────────────┘
                    │
 ┌──────────────────▼──────────────────────────────────────────┐
-│              SERVING — Render Free Tier                      │
+│              SERVING LAYER                                   │
 │  FastAPI /predict · /predict/batch · /health · /model/info  │
-│  Optional SHAP explainability · Evidently drift monitoring  │
-│  https://credit-risk-intelligence-xv4z.onrender.com         │
+│  Optional SHAP · Evidently drift monitoring                 │
+│  Streamlit Scorecard Dashboard (Live Ratio Calculator)      │
+│  https://credit-risk-intelligence.streamlit.app             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -105,10 +106,10 @@ curl -X POST https://credit-risk-intelligence-xv4z.onrender.com/predict \
 | Logistic Regression (baseline) | 0.730 |
 | XGBoost 5-fold CV | 0.785 |
 | LightGBM 5-fold CV | 0.789 |
-| XGB + LGB Ensemble | **0.7899** ⭐ |
+| **XGB + LGB + CatBoost Ensemble** | **0.7899** ⭐ |
 
-### Top SHAP Features
-1. `EXT_SOURCE_2` — External credit score 2
+### Top 10 SHAP Features
+1. `EXT_SOURCE_2` — External credit score 2 (strongest predictor)
 2. `EXT_SOURCE_3` — External credit score 3
 3. `EXT_SOURCE_1` — External credit score 1
 4. `inst_late_rate` — Historical installment late payment rate
@@ -132,6 +133,7 @@ credit-risk-intelligence/
 ├── api/
 │   ├── main.py                  FastAPI app, 8 endpoints
 │   └── schemas.py               Pydantic v2 validation
+├── streamlit_app.py             Live scoring dashboard (4 pages)
 ├── notebooks/
 │   ├── 01_EDA_Credit_Risk.py
 │   ├── 02_Model_Training_MLflow.py
@@ -140,8 +142,7 @@ credit-risk-intelligence/
 ├── configs/config.yaml
 ├── Dockerfile
 ├── docker-compose.yml
-├── render.yaml
-└── requirements.txt
+└── render.yaml
 ```
 
 ---
@@ -151,13 +152,13 @@ credit-risk-intelligence/
 ```bash
 git clone https://github.com/Vaidik6920/credit-risk-intelligence
 cd credit-risk-intelligence
-pip install -r requirements.txt
+pip install -r requirements_render.txt
 
 # Download dataset from kaggle.com/c/home-credit-default-risk
 python src/feature_engineering.py
 python src/train.py
-uvicorn api.main:app --reload
-# → http://localhost:8000/docs
+uvicorn api.main:app --reload        # API → localhost:8000/docs
+streamlit run streamlit_app.py       # Dashboard → localhost:8501
 ```
 
 ---
